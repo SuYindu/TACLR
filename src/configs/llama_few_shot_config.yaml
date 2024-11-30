@@ -1,0 +1,14 @@
+defaults:
+  - base_config
+
+paradigm: "generation"
+model_name: "meta-llama/Llama-3.1-8B-Instruct"
+
+do_train: false
+do_eval: true
+per_device_eval_batch_size: 16
+
+n_shots: 3
+example_selector: "random"
+
+bf16: true 

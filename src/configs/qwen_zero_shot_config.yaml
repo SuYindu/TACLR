@@ -1,0 +1,13 @@
+defaults:
+  - base_config
+
+paradigm: "generation"
+model_name: "Qwen/Qwen2.5-7B-Instruct"
+
+do_train: false
+do_eval: true
+per_device_eval_batch_size: 16
+
+n_shots: 0
+
+bf16: true 
