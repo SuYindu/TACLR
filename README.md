@@ -2,7 +2,7 @@
 
 ## Quick Start
 
-### Multi-label Classification with RoBERTa
+### Multi-label Classification
 ```bash
 accelerate launch \
     --config_file configs/accelerate_config_4gpu.yaml \
@@ -10,7 +10,7 @@ accelerate launch \
     --config configs/roberta_classification_config.yaml
 ```
 
-### Zero-shot Generation with LLMs
+### Zero-shot Generation
 ```bash
 # Qwen-based zero-shot inference
 accelerate launch \

@@ -3,10 +3,11 @@ from transformers import AutoTokenizer
 from data import (
     load_dataset, create_taxonomy, preprocess,
     create_label_mapping, ClassificationDataCollator, 
-    create_category_guidelines, GenerationDataCollator, FewShotExampleSelector
+    create_category_guidelines, GenerationDataCollator, FewShotExampleSelector,
+    BaseDataCollator
 )
-from model import PlmForClassification, LlmForGeneration
-from trainer import ClassificationTrainer, GenerationTrainer
+from model import PlmForClassification, LlmForGeneration, PlmForRetrieval
+from trainer import ClassificationTrainer, GenerationTrainer, RetrievalTrainer
 from utils import set_seed, get_args, get_training_args, save_results
 
 
@@ -24,8 +25,18 @@ def main(args):
     
     if args.paradigm == "classification":
         idx_to_label, label_to_idx = create_label_mapping(taxonomy)
-        train_dataset = preprocess(dataset_dict['train'], tokenizer, args.paradigm, label_to_idx=label_to_idx)
-        eval_dataset = preprocess(dataset_dict['test'], tokenizer, args.paradigm, label_to_idx=label_to_idx)
+        train_dataset = preprocess(
+            dataset_dict['train'], 
+            tokenizer, 
+            args.paradigm, 
+            label_to_idx=label_to_idx, 
+        )
+        eval_dataset = preprocess(
+            dataset_dict['test'], 
+            tokenizer, 
+            args.paradigm, 
+            label_to_idx=label_to_idx
+        )
         data_collator = ClassificationDataCollator(tokenizer)
         model = PlmForClassification(args.model_name, idx_to_label, label_to_idx)
         trainer_cls = ClassificationTrainer
@@ -33,7 +44,29 @@ def main(args):
             "idx_to_label": idx_to_label,
             "threshold": args.threshold
         }
-    else:
+    elif args.paradigm == "retrieval":
+        train_dataset = preprocess(
+            dataset_dict['train'], 
+            tokenizer, 
+            args.paradigm, 
+            do_train=args.do_train
+        )
+        eval_dataset = preprocess(
+            dataset_dict['test'], 
+            tokenizer, 
+            args.paradigm
+        )
+        data_collator = BaseDataCollator(tokenizer)
+        model = PlmForRetrieval(
+            model_name=args.model_name,
+            taxonomy=taxonomy,
+            projection_dim=None,
+            temperature=args.temperature,
+            num_samples=args.num_samples
+        )
+        trainer_cls = RetrievalTrainer
+        trainer_kwargs = {}
+    else:  # generation
         tokenizer.pad_token = tokenizer.eos_token
         category_guidelines = create_category_guidelines(taxonomy)
         if not args.do_train and args.n_shots > 0:

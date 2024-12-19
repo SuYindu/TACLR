@@ -31,6 +31,18 @@ def get_run_name(args, n_process):
             f"_ep{args.num_train_epochs}"
             f"_seed{args.seed}"
         )
+    elif args.paradigm == "retrieval":
+        return (
+            f"{args.paradigm}"
+            f"_{model_name_short}"
+            f"_dim{args.projection_dim}"
+            f"_temp{args.temperature}"
+            f"_ns{args.num_samples}"
+            f"_lr{args.learning_rate}"
+            f"_bs{args.per_device_train_batch_size}*{n_process}"
+            f"_ep{args.num_train_epochs}"
+            f"_seed{args.seed}"
+        )
     else:  # generation
         if args.do_train:
             return (

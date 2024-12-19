@@ -31,5 +31,6 @@ def create_label_tensor(category, pairs, label_to_idx):
 class ClassificationDataCollator(BaseDataCollator):
     def __call__(self, features):
         batch = super().__call__(features)
-        batch['labels_batch'] = torch.stack([torch.tensor(f['labels']) for f in features])
+        if 'labels' in features[0]:
+            batch['labels_batch'] = torch.stack([torch.tensor(f['labels']) for f in features])
         return batch

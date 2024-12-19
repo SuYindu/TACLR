@@ -73,6 +73,8 @@ def preprocess(
                 sample['pairs'],
                 label_to_idx
             )
+        elif paradigm == 'retrieval':
+            text = f"title: {sample['title']}\ndescription: {sample['description']}"
         else:  # generation
             if category_to_guidelines is None:
                 raise ValueError("Category guidelines required for generation")

@@ -21,14 +21,14 @@ class PlmForClassification(nn.Module):
         attention_mask,
         categories,
         pairs_batch,
-        labels_batch=None,
+        labels_batch,
     ):
         outputs = self.model(input_ids=input_ids, attention_mask=attention_mask)
         base_logits = outputs.logits
 
         # mask for the valid pairs
         all_logits = []
-        batch_loss = None if labels_batch is None else 0.0
+        batch_loss = 0.0
         for i, (category, pairs) in enumerate(zip(categories, pairs_batch)):
             sample_mask = torch.zeros(len(self.label_to_idx), device=base_logits.device)
             valid_pairs = {(category, attribute) for attribute in pairs}
@@ -40,14 +40,12 @@ class PlmForClassification(nn.Module):
             sample_logits = base_logits[i] * sample_mask - (1 - sample_mask) * 1e5
             all_logits.append(sample_logits)
             
-            if labels_batch is not None:
-                sample_loss = self.bce_loss(sample_logits, labels_batch[i])
-                sample_loss = (sample_loss * sample_mask).sum() / (sample_mask.sum() + 1e-6)
-                batch_loss += sample_loss
+            sample_loss = self.bce_loss(sample_logits, labels_batch[i])
+            sample_loss = (sample_loss * sample_mask).sum() / (sample_mask.sum() + 1e-6)
+            batch_loss += sample_loss
         
         stacked_logits = torch.stack(all_logits)
-        if labels_batch is not None:
-            batch_loss = batch_loss / len(input_ids)
+        batch_loss = batch_loss / len(input_ids)
 
         return {
             "logits": stacked_logits,
