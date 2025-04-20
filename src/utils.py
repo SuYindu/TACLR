@@ -34,14 +34,14 @@ def get_run_name(args, n_process):
     elif args.paradigm == "retrieval":
         return (
             f"{args.paradigm}"
-            f"_{model_name_short}"
-            f"_dim{args.projection_dim}"
-            f"_temp{args.temperature}"
-            f"_ns{args.num_samples}"
-            f"_lr{args.learning_rate}"
-            f"_bs{args.per_device_train_batch_size}*{n_process}"
-            f"_ep{args.num_train_epochs}"
-            f"_seed{args.seed}"
+            + f"_{model_name_short}"
+            + (f"_dim{args.dim_proj}" if args.dim_proj else "")
+            + f"_temp{args.temperature}"
+            + f"_ns{args.num_samples}"
+            + f"_lr{args.learning_rate}"
+            + f"_bs{args.per_device_train_batch_size}*{n_process}"
+            + (f"_ep{args.num_train_epochs}" if getattr(args, 'max_steps', None) is None else f"_st{args.max_steps}")
+            + f"_seed{args.seed}"
         )
     else:  # generation
         if args.do_train:
@@ -118,7 +118,6 @@ def get_training_args(args):
         report_to="wandb",
         log_level='info',
         full_determinism=True,
-        logging_steps=args.logging_steps,
         bf16=args.bf16,
         fp16=args.fp16,
         ddp_find_unused_parameters=False,
@@ -131,12 +130,16 @@ def get_training_args(args):
         learning_rate=args.learning_rate,
         lr_scheduler_type=args.lr_scheduler_type,
         num_train_epochs=args.num_train_epochs,
+        max_steps=args.max_steps,
         gradient_accumulation_steps=args.gradient_accumulation_steps,
         max_grad_norm=args.max_grad_norm,
 
         logging_strategy=args.logging_strategy,
-        eval_strategy=args.evaluation_strategy,
+        logging_steps=args.logging_steps,
+        eval_strategy=args.eval_strategy,
+        eval_steps=args.eval_steps,
         save_strategy=args.save_strategy,
+        save_steps=args.save_steps,
         metric_for_best_model=args.metric_for_best_model,
         load_best_model_at_end=args.load_best_model_at_end,
         greater_is_better=args.greater_is_better,

@@ -54,3 +54,11 @@ accelerate launch \
     main.py \
     --config configs/llama_fine_tune_config.yaml
 ```
+
+### Taxonomy-Aware Contrastive Learning Retrieval
+```bash
+accelerate launch \
+    --config_file configs/accelerate_config_8gpu.yaml \
+    main.py \
+    --config configs/roberta_retrieval_config.yaml
+```

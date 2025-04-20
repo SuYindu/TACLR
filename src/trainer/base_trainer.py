@@ -25,6 +25,7 @@ class BaseTrainer(Trainer):
             collate_fn=self.data_collator,
             num_workers=self.args.dataloader_num_workers,
             pin_memory=self.args.dataloader_pin_memory,
+            drop_last=True
         )
         train_dataloader = prepare_data_loader(train_dataloader, dispatch_batches=False)
 

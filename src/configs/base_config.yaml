@@ -6,9 +6,9 @@ seed: 42
 do_train: false
 do_eval: true
 
-logging_steps: 10
 logging_strategy: steps
-evaluation_strategy: epoch
+logging_steps: 10
+eval_strategy: epoch
 save_strategy: epoch
 save_total_limit: 3
 metric_for_best_model: overall_average_f1_score

@@ -1,10 +1,9 @@
 import os
 from transformers import AutoTokenizer
 from data import (
-    load_dataset, create_taxonomy, preprocess,
+    load_dataset, create_taxonomy, preprocess, BaseDataCollator,
     create_label_mapping, ClassificationDataCollator, 
-    create_category_guidelines, GenerationDataCollator, FewShotExampleSelector,
-    BaseDataCollator
+    create_category_guidelines, GenerationDataCollator, FewShotExampleSelector
 )
 from model import PlmForClassification, LlmForGeneration, PlmForRetrieval
 from trainer import ClassificationTrainer, GenerationTrainer, RetrievalTrainer
@@ -60,7 +59,7 @@ def main(args):
         model = PlmForRetrieval(
             model_name=args.model_name,
             taxonomy=taxonomy,
-            projection_dim=None,
+            dim_proj=args.dim_proj,
             temperature=args.temperature,
             num_samples=args.num_samples
         )

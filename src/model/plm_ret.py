@@ -8,17 +8,17 @@ from transformers import AutoConfig, AutoModel, AutoTokenizer
 
 
 class BertEncoder(nn.Module):
-    def __init__(self, model_name, projection_dim=None):
+    def __init__(self, model_name, dim_proj=None):
         super().__init__()
         
         self.config = AutoConfig.from_pretrained(model_name)
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.backbone = AutoModel.from_pretrained(model_name, add_pooling_layer=False)
         
-        if not projection_dim:
+        if not dim_proj:
             self.proj = nn.Identity()
         else:
-            self.proj = nn.Linear(self.config.hidden_size, projection_dim)
+            self.proj = nn.Linear(self.config.hidden_size, dim_proj)
 
     def forward(self, sentences, batch_size=32):
         embedding_list = []
@@ -53,13 +53,13 @@ class PlmForRetrieval(nn.Module):
         self, 
         model_name, 
         taxonomy, 
-        projection_dim=None, 
+        dim_proj=None, 
         temperature=DEFAULT_TEMPERATURE,
         num_samples=DEFAULT_NUM_SAMPLES,
     ):
         super().__init__()
         
-        self.encoder = BertEncoder(model_name, projection_dim)
+        self.encoder = BertEncoder(model_name, dim_proj)
         self.taxonomy = taxonomy
         self.temperature = temperature
         self.num_samples = num_samples
